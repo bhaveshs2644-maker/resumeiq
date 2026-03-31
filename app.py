@@ -14,21 +14,22 @@ def extract_text_from_pdf(pdf_file):
     return text
 
 def extract_keywords(text):
-    words = re.findall(r'\b[a-zA-Z]{3,}\b', text.lower())
-    stopwords = {"and","the","for","with","that","this","are","was","you","have","from","your","our","will","can","has","but","not","all","they","been","its","more","also","their","we","an","in","of","to","a","is","it","on","at","be","as","or","by","do","if","so","up","no","my","he","she","his","her","we","us","me","him","who","how","what","when","where","why","which","would","could","should","about","into","than","then","there","these","those","such","each","any","may","had","him","did","get","got","make","made","use","used","just","like","over","after","before","between","through","during","while","other","some","both","few","more","most","other","same","than","too","very","just","because","since","though","although","however","therefore","thus","hence","either","neither","whether","unless","until","once","even","still","already","yet","again","further","once"}
+    words = re.findall(r'\b[a-zA-Z]{4,}\b', text.lower())
+    stopwords = {"with","that","this","have","from","your","will","also","their","about","into","than","then","there","these","those","such","each","been","more","some","both","very","just","when","where","what","which","would","could","should","other","after","before","while","through","during","between","because","however","therefore","thus","either","whether","unless","until","even","still","already","further","once","they","were","over","only","need","make","made","used","like","does","doing","well","must","many","much","most","high","work","area","role","team","time","year","years","based","using","within","across","including","ensure","support","experience","ability","strong","skills","knowledge","understanding","working","provide","develop","manage","business","company","position","required","preferred","related","relevant","following","please","apply","including","candidate","candidates","responsibilities","qualifications","minimum","salary","benefits","employment","opportunity","equal","employer","applicants","without","regard","race","color","religion","national","origin","disability","veteran","status"}
     return set(w for w in words if w not in stopwords)
 
 def get_match(resume_text, jd_text):
     embeddings = model.encode([resume_text, jd_text])
-    score = cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
+    raw_score = cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
+    score = max(0, min(100, round(float(raw_score) * 100, 2)))
     
     resume_kw = extract_keywords(resume_text)
     jd_kw = extract_keywords(jd_text)
     
-    strengths = resume_kw & jd_kw
-    gaps = jd_kw - resume_kw
+    strengths = list(resume_kw & jd_kw)[:15]
+    gaps = list(jd_kw - resume_kw)[:15]
     
-    return round(float(score) * 100, 2), list(strengths)[:15], list(gaps)[:15]
+    return score, strengths, gaps
 
 st.set_page_config(page_title="ResumeIQ", page_icon="📄")
 st.title("📄 ResumeIQ — Resume Matcher")
@@ -64,3 +65,5 @@ if st.button("Analyse"):
             st.markdown("### ❌ Gaps")
             for g in gaps:
                 st.markdown(f"- {g}")
+
+        
