@@ -4,6 +4,9 @@ An AI-powered web app that matches your resume to a job description.
 
 ## Live App
 🔗 [Click here to use the app](https://resumeiq-tki3cpg6rjcbnnmdetnac7.streamlit.app)
+## Video Walkthrough
+🎥 [Watch the demo](https://drive.google.com/file/d/1aeaitLyaHhf2X9LkrxO1pqdjiLROMuBP/view?usp=drivesdk)
+
 
 ## What it does
 - Upload your resume (PDF) and paste a job description
